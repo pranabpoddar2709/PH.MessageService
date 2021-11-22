@@ -37,8 +37,13 @@ namespace MessageService
             var data = JsonConvert.DeserializeObject<List<MessageMaster>>(requestBody);
             try
             {
-                await _genericRepository.BulkInsert(data);
-                return new OkResult();
+                if (data != null && data.Count > 0)
+                {
+                    data.Select(c => { c.MessageDate = DateTime.Now; c.Status = Status.InProgress.ToString(); return c; }).ToList();
+                    await _genericRepository.BulkInsert(data);
+                    return new OkResult();
+                }
+                return new BadRequestResult();
             }
             catch (Exception e)
             {
@@ -106,8 +111,8 @@ namespace MessageService
             }
         }
 
-        [FunctionName("SendNotification")]
-        public async Task Run([TimerTrigger("*/30 */1 * * * *")] TimerInfo myTimer, ILogger log)
+        [FunctionName("ProcessNotification")]
+        public async Task Run([TimerTrigger("%NotificationJobTimer%")] TimerInfo myTimer, ILogger log)
         {
             log.LogInformation($"C# Timer trigger function executed at: {DateTime.Now}");
 

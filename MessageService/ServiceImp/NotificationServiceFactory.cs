@@ -26,9 +26,9 @@ namespace PH.MessageService.ServiceImp
             switch (mode)
             {
                 case NotificationMode.SMS:
-                    return new SMSNotificationService();
+                    return new SMSNotificationService(Environment.GetEnvironmentVariable("AcsUrl"));
                 case NotificationMode.Email:
-                    return new EmailNotificationService();
+                    return new EmailNotificationService(Environment.GetEnvironmentVariable("AcsUrl"));
                 default:
                     throw new ArgumentOutOfRangeException(nameof(mode), mode, $"Mode of {mode} is not supported.");
             }

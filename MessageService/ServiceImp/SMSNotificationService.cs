@@ -14,21 +14,14 @@ namespace PH.MessageService.ServiceImp
     public class SMSNotificationService : INotificationService
     {
         private static readonly DefaultAzureCredential credential = new DefaultAzureCredential();
-
+        private readonly string _acsURLEndPoint ;
+        public SMSNotificationService(string acsURLEndPoint)
+        {
+            _acsURLEndPoint = acsURLEndPoint;
+        }
         public async Task SendNotification(MessageMaster messageMaster)
         {
-            SmsSendResult result = await SendSms(new Uri(Environment.GetEnvironmentVariable("AcsUrl")), messageMaster.From, messageMaster.To, messageMaster.Details);
-        }
-
-        public  Response<AccessToken> CreateIdentityAndGetTokenAsync(Uri resourceEndpoint)
-        {
-            var client = new CommunicationIdentityClient(resourceEndpoint, credential);
-            var identityResponse = client.CreateUser();
-            var identity = identityResponse.Value;
-
-            var tokenResponse = client.GetToken(identity, scopes: new[] { CommunicationTokenScope.VoIP });
-
-            return tokenResponse;
+            SmsSendResult result = await SendSms(new Uri(_acsURLEndPoint), messageMaster.From, messageMaster.To, messageMaster.Details);
         }
         public async Task<SmsSendResult> SendSms(Uri resourceEndpoint, string from, string to, string message)
         {
